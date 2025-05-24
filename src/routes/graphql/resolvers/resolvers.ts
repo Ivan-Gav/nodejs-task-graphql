@@ -1,10 +1,8 @@
-import { PrismaClient, Prisma } from '@prisma/client';
-import { DefaultArgs } from '@prisma/client/runtime/library.js';
+import { PrismaClient } from '@prisma/client';
 
-export const getResolvers = (
-  prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-) => ({
+export const getResolvers = (prisma: PrismaClient) => ({
   resolveMemberTypes: async () => prisma.memberType.findMany(),
+
   resolveTypeMemberById: async (id: string) =>
     prisma.memberType.findUnique({
       where: {
@@ -13,11 +11,28 @@ export const getResolvers = (
     }),
 
   resolvePosts: async () => prisma.post.findMany(),
-  resolvePostById: async () => {},
+
+  resolvePostById: async (id: string) =>
+    prisma.post.findUnique({
+      where: {
+        id,
+      },
+    }),
 
   resolveUsers: async () => prisma.user.findMany(),
-  resolveUserById: async () => {},
+
+  resolveUserById: async (id: string) =>
+    prisma.user.findUnique({
+      where: {
+        id,
+      },
+    }),
 
   resolveProfiles: async () => prisma.profile.findMany(),
-  resolveProfileById: async () => {},
+  resolveProfileById: async (id: string) =>
+    prisma.profile.findUnique({
+      where: {
+        id,
+      },
+    }),
 });
