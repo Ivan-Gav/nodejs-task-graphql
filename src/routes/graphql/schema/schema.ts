@@ -7,12 +7,28 @@ import {
   GraphQLFloat,
   GraphQLBoolean,
   GraphQLList,
+  GraphQLSchema,
 } from 'graphql';
 import { UUIDType } from '../types/uuid.js';
-import { PrismaClient } from '@prisma/client';
-import { User, Profile } from '@prisma/client';
+import { resolvers } from '../resolvers/resolvers.js';
 
-export const EMemberTypeIdsEnum = new GraphQLEnumType({
+const {
+  resolveProfileByUserId,
+  resolvePostsByUserId,
+  resolveSubscribedToByUserId,
+  resolveSubscribedToUserByUserId,
+  resolveMemberTypeByProfileId,
+  resolveMemberTypes,
+  resolveTypeMemberById,
+  resolvePosts,
+  resolvePostById,
+  resolveUsers,
+  resolveUserById,
+  resolveProfiles,
+  resolveProfileById,
+} = resolvers;
+
+const EMemberTypeIdsEnum = new GraphQLEnumType({
   name: 'MemberTypeId',
   values: {
     BASIC: {
@@ -24,7 +40,7 @@ export const EMemberTypeIdsEnum = new GraphQLEnumType({
   },
 });
 
-export const TMemberType = new GraphQLObjectType({
+const TMemberType = new GraphQLObjectType({
   name: 'MemberType',
   fields: {
     id: { type: new GraphQLNonNull(EMemberTypeIdsEnum) },
@@ -33,7 +49,7 @@ export const TMemberType = new GraphQLObjectType({
   },
 });
 
-export const TPost = new GraphQLObjectType({
+const TPost = new GraphQLObjectType({
   name: 'Post',
   fields: () => ({
     id: { type: new GraphQLNonNull(UUIDType) },
@@ -42,7 +58,7 @@ export const TPost = new GraphQLObjectType({
   }),
 });
 
-export const TUser = new GraphQLObjectType({
+const TUser: GraphQLObjectType = new GraphQLObjectType({
   name: 'User',
   fields: () => ({
     id: { type: new GraphQLNonNull(UUIDType) },
@@ -50,54 +66,24 @@ export const TUser = new GraphQLObjectType({
     balance: { type: new GraphQLNonNull(GraphQLFloat) },
     profile: {
       type: TProfile,
-      resolve: (parent: User, _, { prisma }: { prisma: PrismaClient }) => {
-        return prisma.profile.findUnique({
-          where: { userId: parent.id },
-        });
-      },
+      resolve: resolveProfileByUserId,
     },
     posts: {
       type: new GraphQLList(TPost),
-      resolve: (parent, _, { prisma }) => {
-        return prisma.post.findMany({
-          where: { authorId: parent.id },
-        });
-      },
+      resolve: resolvePostsByUserId,
     },
     userSubscribedTo: {
       type: new GraphQLList(TUser),
-      resolve: async (parent: User, _, { prisma }: { prisma: PrismaClient }) => {
-        return prisma.subscribersOnAuthors
-          .findMany({
-            where: {
-              subscriberId: parent.id,
-            },
-            include: {
-              author: true,
-            },
-          })
-          .then((subs) => subs.map((sub) => sub.author));
-      },
+      resolve: resolveSubscribedToByUserId,
     },
     subscribedToUser: {
       type: new GraphQLList(TUser),
-      resolve: async (parent, _, { prisma }) => {
-        return prisma.subscribersOnAuthors
-          .findMany({
-            where: {
-              authorId: parent.id,
-            },
-            include: {
-              subscriber: true,
-            },
-          })
-          .then((subs) => subs.map((sub) => sub.subscriber));
-      },
+      resolve: resolveSubscribedToUserByUserId,
     },
   }),
 });
 
-export const TProfile = new GraphQLObjectType({
+const TProfile = new GraphQLObjectType({
   name: 'Profile',
   fields: () => ({
     id: { type: new GraphQLNonNull(UUIDType) },
@@ -105,10 +91,67 @@ export const TProfile = new GraphQLObjectType({
     yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
     memberType: {
       type: TMemberType,
-      resolve: (parent: Profile, _, { prisma }: { prisma: PrismaClient }) => {
-        return prisma.memberType.findUnique({
-          where: { id: parent.memberTypeId },
-        });
+      resolve: resolveMemberTypeByProfileId,
+    },
+  }),
+});
+
+export const schema = new GraphQLSchema({
+  query: new GraphQLObjectType({
+    name: 'RootQuery',
+    fields: {
+      memberTypes: {
+        type: new GraphQLList(TMemberType),
+        resolve: resolveMemberTypes,
+      },
+
+      memberType: {
+        type: TMemberType,
+        args: {
+          id: {
+            type: new GraphQLNonNull(EMemberTypeIdsEnum),
+          },
+        },
+        resolve: resolveTypeMemberById,
+      },
+
+      posts: {
+        type: new GraphQLList(TPost),
+        resolve: resolvePosts,
+      },
+
+      post: {
+        type: TPost,
+        args: {
+          id: {
+            type: new GraphQLNonNull(UUIDType),
+          },
+        },
+        resolve: resolvePostById,
+      },
+
+      users: { type: new GraphQLList(TUser), resolve: resolveUsers },
+
+      user: {
+        type: TUser,
+        args: {
+          id: {
+            type: new GraphQLNonNull(UUIDType),
+          },
+        },
+        resolve: resolveUserById,
+      },
+
+      profiles: { type: new GraphQLList(TProfile), resolve: resolveProfiles },
+
+      profile: {
+        type: TProfile,
+        args: {
+          id: {
+            type: new GraphQLNonNull(UUIDType),
+          },
+        },
+        resolve: resolveProfileById,
       },
     },
   }),
