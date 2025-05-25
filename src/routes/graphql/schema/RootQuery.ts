@@ -1,13 +1,7 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLList } from 'graphql';
 import { UUIDType } from '../types/uuid.js';
-import { resolvers } from '../resolvers/resolvers.js';
-import {
-  TMemberType,
-  EMemberTypeIdsEnum,
-  TPost,
-  TUser,
-  TProfile,
-} from '../types/gqlEntities.js';
+import { queryResolvers } from '../resolvers/queryResolvers.js';
+import { MemberType, MemberTypeIdsEnum, Post, User, Profile } from './gqlEntities.js';
 
 const {
   resolveMemberTypes,
@@ -18,33 +12,33 @@ const {
   resolveUserById,
   resolveProfiles,
   resolveProfileById,
-} = resolvers;
+} = queryResolvers;
 
 export const RootQuery = new GraphQLObjectType({
   name: 'RootQuery',
   fields: {
     memberTypes: {
-      type: new GraphQLList(TMemberType),
+      type: new GraphQLList(MemberType),
       resolve: resolveMemberTypes,
     },
 
     memberType: {
-      type: TMemberType,
+      type: MemberType,
       args: {
         id: {
-          type: new GraphQLNonNull(EMemberTypeIdsEnum),
+          type: new GraphQLNonNull(MemberTypeIdsEnum),
         },
       },
       resolve: resolveTypeMemberById,
     },
 
     posts: {
-      type: new GraphQLList(TPost),
+      type: new GraphQLList(Post),
       resolve: resolvePosts,
     },
 
     post: {
-      type: TPost,
+      type: Post,
       args: {
         id: {
           type: new GraphQLNonNull(UUIDType),
@@ -53,10 +47,10 @@ export const RootQuery = new GraphQLObjectType({
       resolve: resolvePostById,
     },
 
-    users: { type: new GraphQLList(TUser), resolve: resolveUsers },
+    users: { type: new GraphQLList(User), resolve: resolveUsers },
 
     user: {
-      type: TUser,
+      type: User,
       args: {
         id: {
           type: new GraphQLNonNull(UUIDType),
@@ -65,10 +59,10 @@ export const RootQuery = new GraphQLObjectType({
       resolve: resolveUserById,
     },
 
-    profiles: { type: new GraphQLList(TProfile), resolve: resolveProfiles },
+    profiles: { type: new GraphQLList(Profile), resolve: resolveProfiles },
 
     profile: {
-      type: TProfile,
+      type: Profile,
       args: {
         id: {
           type: new GraphQLNonNull(UUIDType),

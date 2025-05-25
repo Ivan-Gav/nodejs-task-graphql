@@ -1,31 +1,24 @@
-import type { PrismaClient } from '@prisma/client';
-import { TLoaders } from '../loaders/loaders.js';
-import { TProfile, TUser } from '../types/types.js';
-
-export interface Context {
-  prisma: PrismaClient;
-  loaders: TLoaders;
-}
+import { Profile, User, TContext } from '../types/types.js';
 
 export const loaderResolvers = {
-  resolvePostsWithLoader: async ({ id }: TUser, _args: unknown, { loaders }: Context) =>
+  resolvePostsWithLoader: async ({ id }: User, _args: unknown, { loaders }: TContext) =>
     loaders.postsByAuthorId.load(id),
 
-  resolveProfileWithLoader: async ({ id }: TUser, _args: unknown, { loaders }: Context) =>
+  resolveProfileWithLoader: async ({ id }: User, _args: unknown, { loaders }: TContext) =>
     loaders.profileByUserId.load(id),
 
   resolveMemberTypeWithLoader: async (
-    { memberTypeId }: TProfile,
+    { memberTypeId }: Profile,
     _args: unknown,
-    { loaders }: Context,
+    { loaders }: TContext,
   ) => (memberTypeId ? loaders.memberTypeById.load(memberTypeId) : null),
 
-  resolveSubscribedToWithLoader: ({ id }: TUser, _args: unknown, { loaders }: Context) =>
+  resolveSubscribedToWithLoader: ({ id }: User, _args: unknown, { loaders }: TContext) =>
     loaders.userSubscribedTo.load(id),
 
   resolveSubscribedToUserWithLoader: (
-    { id }: TUser,
+    { id }: User,
     _args: unknown,
-    { loaders }: Context,
+    { loaders }: TContext,
   ) => loaders.subscribedToUser.load(id),
 };

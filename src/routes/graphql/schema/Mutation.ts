@@ -1,6 +1,6 @@
 import { GraphQLBoolean, GraphQLNonNull, GraphQLObjectType } from 'graphql';
-import { resolvers } from '../resolvers/resolvers.js';
-import { TPost, TProfile, TUser } from '../types/gqlEntities.js';
+import { mutationResolvers } from '../resolvers/mutationResolvers.js';
+import { Post, Profile, User } from './gqlEntities.js';
 import {
   CreatePostInput,
   CreateProfileInput,
@@ -8,7 +8,7 @@ import {
   ChangePostInput,
   ChangeProfileInput,
   ChangeUserInput,
-} from '../types/gqlInputs.js';
+} from './gqlInputs.js';
 import { UUIDType } from '../types/uuid.js';
 
 export const Mutation = new GraphQLObjectType({
@@ -26,11 +26,11 @@ export const Mutation = new GraphQLObjectType({
       resolveChangeProfile,
       resolveSubscribeToUser,
       resolveUnubscribeFromUser,
-    } = resolvers;
+    } = mutationResolvers;
 
     return {
       createUser: {
-        type: TUser,
+        type: User,
         args: {
           dto: { type: new GraphQLNonNull(CreateUserInput) },
         },
@@ -38,7 +38,7 @@ export const Mutation = new GraphQLObjectType({
       },
 
       createPost: {
-        type: TPost,
+        type: Post,
         args: {
           dto: { type: new GraphQLNonNull(CreatePostInput) },
         },
@@ -46,7 +46,7 @@ export const Mutation = new GraphQLObjectType({
       },
 
       createProfile: {
-        type: TProfile,
+        type: Profile,
         args: {
           dto: { type: new GraphQLNonNull(CreateProfileInput) },
         },
@@ -78,7 +78,7 @@ export const Mutation = new GraphQLObjectType({
       },
 
       changeUser: {
-        type: TUser,
+        type: User,
         args: {
           id: { type: new GraphQLNonNull(UUIDType) },
           dto: { type: new GraphQLNonNull(ChangeUserInput) },
@@ -87,7 +87,7 @@ export const Mutation = new GraphQLObjectType({
       },
 
       changePost: {
-        type: TPost,
+        type: Post,
         args: {
           id: { type: new GraphQLNonNull(UUIDType) },
           dto: { type: new GraphQLNonNull(ChangePostInput) },
@@ -96,7 +96,7 @@ export const Mutation = new GraphQLObjectType({
       },
 
       changeProfile: {
-        type: TProfile,
+        type: Profile,
         args: {
           id: { type: new GraphQLNonNull(UUIDType) },
           dto: { type: new GraphQLNonNull(ChangeProfileInput) },

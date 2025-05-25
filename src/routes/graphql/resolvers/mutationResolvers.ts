@@ -1,24 +1,19 @@
-import type { PrismaClient } from '@prisma/client';
-
 import {
+  TContext,
   TDto,
-  TPostChange,
-  TPostInput,
-  TProfileChange,
-  TProfileInput,
+  PostChange,
+  PostInput,
+  ProfileChange,
+  ProfileInput,
   TSubscriptionInput,
-  TUserInput,
+  UserInput,
 } from '../types/types.js';
 
-export interface PrismaContext {
-  prisma: PrismaClient;
-}
-
-export const vutationResolvers = {
+export const mutationResolvers = {
   resolveCreateUser: async (
     _parent: unknown,
-    { dto }: TDto<TUserInput>,
-    { prisma }: PrismaContext,
+    { dto }: TDto<UserInput>,
+    { prisma }: TContext,
   ) => {
     const { name, balance } = dto;
 
@@ -32,8 +27,8 @@ export const vutationResolvers = {
 
   resolveCreatePost: async (
     _parent: unknown,
-    { dto }: TDto<TPostInput>,
-    { prisma }: PrismaContext,
+    { dto }: TDto<PostInput>,
+    { prisma }: TContext,
   ) => {
     const { title, content, authorId } = dto;
 
@@ -50,8 +45,8 @@ export const vutationResolvers = {
 
   resolveCreateProfile: async (
     _parent: unknown,
-    { dto }: TDto<TProfileInput>,
-    { prisma }: PrismaContext,
+    { dto }: TDto<ProfileInput>,
+    { prisma }: TContext,
   ) => {
     const { isMale, yearOfBirth, userId, memberTypeId } = dto;
     return prisma.profile.create({
@@ -71,7 +66,7 @@ export const vutationResolvers = {
   resolveDeleteUser: async (
     _parent: unknown,
     { id }: { id: string },
-    { prisma }: PrismaContext,
+    { prisma }: TContext,
   ) => {
     await prisma.user.delete({
       where: { id },
@@ -82,7 +77,7 @@ export const vutationResolvers = {
   resolveDeletePost: async (
     _parent: unknown,
     { id }: { id: string },
-    { prisma }: PrismaContext,
+    { prisma }: TContext,
   ) => {
     await prisma.post.delete({
       where: { id },
@@ -93,7 +88,7 @@ export const vutationResolvers = {
   resolveDeleteProfile: async (
     _parent: unknown,
     { id }: { id: string },
-    { prisma }: PrismaContext,
+    { prisma }: TContext,
   ) => {
     await prisma.profile.delete({
       where: { id },
@@ -103,8 +98,8 @@ export const vutationResolvers = {
 
   resolveChangeUser: async (
     _parent: unknown,
-    { id, dto }: { id: string; dto: TDto<TUserInput> },
-    { prisma }: PrismaContext,
+    { id, dto }: { id: string; dto: TDto<UserInput> },
+    { prisma }: TContext,
   ) =>
     prisma.user.update({
       where: { id },
@@ -113,8 +108,8 @@ export const vutationResolvers = {
 
   resolveChangePost: async (
     _parent: unknown,
-    { id, dto }: { id: string; dto: TPostChange },
-    { prisma }: PrismaContext,
+    { id, dto }: { id: string; dto: PostChange },
+    { prisma }: TContext,
   ) =>
     prisma.post.update({
       where: { id },
@@ -123,8 +118,8 @@ export const vutationResolvers = {
 
   resolveChangeProfile: async (
     _parent: unknown,
-    { id, dto }: { id: string; dto: TProfileChange },
-    { prisma }: PrismaContext,
+    { id, dto }: { id: string; dto: ProfileChange },
+    { prisma }: TContext,
   ) =>
     prisma.profile.update({
       where: { id },
@@ -134,7 +129,7 @@ export const vutationResolvers = {
   resolveSubscribeToUser: async (
     _parent: unknown,
     { userId, authorId }: TSubscriptionInput,
-    { prisma }: PrismaContext,
+    { prisma }: TContext,
   ) => {
     const subscription = await prisma.subscribersOnAuthors.create({
       data: {
@@ -148,7 +143,7 @@ export const vutationResolvers = {
   resolveUnubscribeFromUser: async (
     _parent: unknown,
     { userId, authorId }: TSubscriptionInput,
-    { prisma }: PrismaContext,
+    { prisma }: TContext,
   ) => {
     const deleted = await prisma.subscribersOnAuthors.delete({
       where: {

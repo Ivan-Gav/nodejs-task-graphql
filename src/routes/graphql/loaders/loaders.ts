@@ -1,10 +1,10 @@
 import DataLoader from 'dataloader';
 import { PrismaClient } from '@prisma/client';
-import { TPost, TProfile, TProfileMemberType, TUser } from '../types/types.js';
+import { Post, Profile, ProfileMemberType, User } from '../types/types.js';
 import { groupBy } from './utils.js';
 
 export const createLoaders = (prisma: PrismaClient) => ({
-  postsByAuthorId: new DataLoader<string, TPost[]>(
+  postsByAuthorId: new DataLoader<string, Post[]>(
     async (authorIds: readonly string[]) => {
       const posts = await prisma.post.findMany({
         where: { authorId: { in: authorIds as string[] } },
@@ -16,7 +16,7 @@ export const createLoaders = (prisma: PrismaClient) => ({
     },
   ),
 
-  profileByUserId: new DataLoader<string, TProfile | null>(
+  profileByUserId: new DataLoader<string, Profile | null>(
     async (userIds: readonly string[]) => {
       const profiles = await prisma.profile.findMany({
         where: { userId: { in: userIds as string[] } },
@@ -28,33 +28,29 @@ export const createLoaders = (prisma: PrismaClient) => ({
     },
   ),
 
-  userSubscribedTo: new DataLoader<string, TUser[]>(
-    async (userIds: readonly string[]) => {
-      const subs = await prisma.subscribersOnAuthors.findMany({
-        where: { subscriberId: { in: userIds as string[] } },
-        include: { author: true },
-      });
+  userSubscribedTo: new DataLoader<string, User[]>(async (userIds: readonly string[]) => {
+    const subs = await prisma.subscribersOnAuthors.findMany({
+      where: { subscriberId: { in: userIds as string[] } },
+      include: { author: true },
+    });
 
-      const grouped = groupBy(subs, (s) => s.subscriberId);
+    const grouped = groupBy(subs, (s) => s.subscriberId);
 
-      return userIds.map((id) => grouped[id]?.map((s) => s.author) ?? []);
-    },
-  ),
+    return userIds.map((id) => grouped[id]?.map((s) => s.author) ?? []);
+  }),
 
-  subscribedToUser: new DataLoader<string, TUser[]>(
-    async (userIds: readonly string[]) => {
-      const subs = await prisma.subscribersOnAuthors.findMany({
-        where: { authorId: { in: userIds as string[] } },
-        include: { subscriber: true },
-      });
+  subscribedToUser: new DataLoader<string, User[]>(async (userIds: readonly string[]) => {
+    const subs = await prisma.subscribersOnAuthors.findMany({
+      where: { authorId: { in: userIds as string[] } },
+      include: { subscriber: true },
+    });
 
-      const grouped = groupBy(subs, (s) => s.authorId);
+    const grouped = groupBy(subs, (s) => s.authorId);
 
-      return userIds.map((id) => grouped[id]?.map((s) => s.subscriber) ?? []);
-    },
-  ),
+    return userIds.map((id) => grouped[id]?.map((s) => s.subscriber) ?? []);
+  }),
 
-  memberTypeById: new DataLoader<string, TProfileMemberType | null>(
+  memberTypeById: new DataLoader<string, ProfileMemberType | null>(
     async (ids: readonly string[]) => {
       const types = await prisma.memberType.findMany({
         where: { id: { in: ids as string[] } },

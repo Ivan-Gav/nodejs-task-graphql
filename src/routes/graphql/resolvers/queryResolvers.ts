@@ -1,53 +1,43 @@
-import type { MemberType, Post, PrismaClient, Profile, User } from '@prisma/client';
-
-export interface PrismaContext {
-  prisma: PrismaClient;
-}
+// import type { MemberType, Post, Profile, User } from '@prisma/client';
+import { TContext, Post, Profile, ProfileMemberType, User } from '../types/types.js';
 
 export const queryResolvers = {
-  resolveMemberTypes: async (
-    _parent: unknown,
-    _args: unknown,
-    { prisma }: PrismaContext,
-  ) => prisma.memberType.findMany(),
+  resolveMemberTypes: async (_parent: unknown, _args: unknown, { prisma }: TContext) =>
+    prisma.memberType.findMany(),
 
   resolveTypeMemberById: async (
     _parent: unknown,
-    { id }: MemberType,
-    { prisma }: PrismaContext,
+    { id }: ProfileMemberType,
+    { prisma }: TContext,
   ) => prisma.memberType.findUnique({ where: { id } }),
 
-  resolvePosts: async (_parent: unknown, _args: unknown, { prisma }: PrismaContext) =>
+  resolvePosts: async (_parent: unknown, _args: unknown, { prisma }: TContext) =>
     prisma.post.findMany(),
 
-  resolvePostById: async (_parent: unknown, { id }: Post, { prisma }: PrismaContext) =>
+  resolvePostById: async (_parent: unknown, { id }: Post, { prisma }: TContext) =>
     prisma.post.findUnique({ where: { id } }),
 
-  resolveUsers: async (_parent: unknown, _args: unknown, { prisma }: PrismaContext) =>
+  resolveUsers: async (_parent: unknown, _args: unknown, { prisma }: TContext) =>
     prisma.user.findMany(),
 
-  resolveUserById: async (_parent: unknown, { id }: User, { prisma }: PrismaContext) =>
+  resolveUserById: async (_parent: unknown, { id }: User, { prisma }: TContext) =>
     prisma.user.findUnique({ where: { id } }),
 
-  resolveProfiles: async (_parent: unknown, _args: unknown, { prisma }: PrismaContext) =>
+  resolveProfiles: async (_parent: unknown, _args: unknown, { prisma }: TContext) =>
     prisma.profile.findMany(),
 
-  resolveProfileById: async (_parent: unknown, { id }: User, { prisma }: PrismaContext) =>
+  resolveProfileById: async (_parent: unknown, { id }: User, { prisma }: TContext) =>
     prisma.profile.findUnique({ where: { id } }),
 
-  resolveProfileByUserId: ({ id }: User, _args: unknown, { prisma }: PrismaContext) => {
+  resolveProfileByUserId: ({ id }: User, _args: unknown, { prisma }: TContext) => {
     return prisma.profile.findUnique({ where: { userId: id } });
   },
 
-  resolvePostsByUserId: ({ id }: User, _args: unknown, { prisma }: PrismaContext) => {
+  resolvePostsByUserId: ({ id }: User, _args: unknown, { prisma }: TContext) => {
     return prisma.post.findMany({ where: { authorId: id } });
   },
 
-  resolveSubscribedToByUserId: (
-    { id }: User,
-    _args: unknown,
-    { prisma }: PrismaContext,
-  ) =>
+  resolveSubscribedToByUserId: ({ id }: User, _args: unknown, { prisma }: TContext) =>
     prisma.subscribersOnAuthors
       .findMany({
         where: { subscriberId: id },
@@ -55,11 +45,7 @@ export const queryResolvers = {
       })
       .then((subs) => subs.map((sub) => sub.author)),
 
-  resolveSubscribedToUserByUserId: (
-    { id }: User,
-    _args: unknown,
-    { prisma }: PrismaContext,
-  ) =>
+  resolveSubscribedToUserByUserId: ({ id }: User, _args: unknown, { prisma }: TContext) =>
     prisma.subscribersOnAuthors
       .findMany({
         where: { authorId: id },
@@ -70,7 +56,7 @@ export const queryResolvers = {
   resolveMemberTypeByProfileId: (
     parent: Profile,
     _args: unknown,
-    { prisma }: PrismaContext,
+    { prisma }: TContext,
   ) => {
     return prisma.memberType.findUnique({ where: { id: parent.memberTypeId } });
   },

@@ -8,17 +8,8 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql';
-import { UUIDType } from './uuid.js';
-import { resolvers } from '../resolvers/resolvers.js';
+import { UUIDType } from '../types/uuid.js';
 import { loaderResolvers } from '../resolvers/loaderResolvers.js';
-
-const {
-  resolveProfileByUserId,
-  resolvePostsByUserId,
-  resolveSubscribedToByUserId,
-  resolveSubscribedToUserByUserId,
-  resolveMemberTypeByProfileId,
-} = resolvers;
 
 const {
   resolveProfileWithLoader,
@@ -28,7 +19,7 @@ const {
   resolveMemberTypeWithLoader,
 } = loaderResolvers;
 
-export const EMemberTypeIdsEnum = new GraphQLEnumType({
+export const MemberTypeIdsEnum = new GraphQLEnumType({
   name: 'MemberTypeId',
   values: {
     BASIC: {
@@ -40,16 +31,16 @@ export const EMemberTypeIdsEnum = new GraphQLEnumType({
   },
 });
 
-export const TMemberType = new GraphQLObjectType({
+export const MemberType = new GraphQLObjectType({
   name: 'MemberType',
   fields: {
-    id: { type: new GraphQLNonNull(EMemberTypeIdsEnum) },
+    id: { type: new GraphQLNonNull(MemberTypeIdsEnum) },
     discount: { type: GraphQLFloat },
     postsLimitPerMonth: { type: GraphQLInt },
   },
 });
 
-export const TPost = new GraphQLObjectType({
+export const Post = new GraphQLObjectType({
   name: 'Post',
   fields: () => ({
     id: { type: new GraphQLNonNull(UUIDType) },
@@ -58,39 +49,39 @@ export const TPost = new GraphQLObjectType({
   }),
 });
 
-export const TUser: GraphQLObjectType = new GraphQLObjectType({
+export const User: GraphQLObjectType = new GraphQLObjectType({
   name: 'User',
   fields: () => ({
     id: { type: new GraphQLNonNull(UUIDType) },
     name: { type: new GraphQLNonNull(GraphQLString) },
     balance: { type: new GraphQLNonNull(GraphQLFloat) },
     profile: {
-      type: TProfile,
+      type: Profile,
       resolve: resolveProfileWithLoader,
     },
     posts: {
-      type: new GraphQLList(TPost),
+      type: new GraphQLList(Post),
       resolve: resolvePostsWithLoader,
     },
     userSubscribedTo: {
-      type: new GraphQLList(TUser),
+      type: new GraphQLList(User),
       resolve: resolveSubscribedToWithLoader,
     },
     subscribedToUser: {
-      type: new GraphQLList(TUser),
+      type: new GraphQLList(User),
       resolve: resolveSubscribedToUserWithLoader,
     },
   }),
 });
 
-export const TProfile = new GraphQLObjectType({
+export const Profile = new GraphQLObjectType({
   name: 'Profile',
   fields: () => ({
     id: { type: new GraphQLNonNull(UUIDType) },
     isMale: { type: new GraphQLNonNull(GraphQLBoolean) },
     yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
     memberType: {
-      type: TMemberType,
+      type: MemberType,
       resolve: resolveMemberTypeWithLoader,
     },
   }),

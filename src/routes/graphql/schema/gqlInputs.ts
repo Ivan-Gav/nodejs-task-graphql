@@ -6,8 +6,8 @@ import {
   GraphQLBoolean,
   GraphQLInt,
 } from 'graphql';
-import { EMemberTypeIdsEnum } from './gqlEntities.js';
-import { UUIDType } from './uuid.js';
+import { MemberTypeIdsEnum } from '../schema/gqlEntities.js';
+import { UUIDType } from '../types/uuid.js';
 
 export const CreateUserInput = new GraphQLInputObjectType({
   name: 'CreateUserInput',
@@ -35,7 +35,7 @@ export const CreateProfileInput = new GraphQLInputObjectType({
     isMale: { type: new GraphQLNonNull(GraphQLBoolean) },
     yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
     userId: { type: new GraphQLNonNull(UUIDType) },
-    memberTypeId: { type: new GraphQLNonNull(EMemberTypeIdsEnum) },
+    memberTypeId: { type: new GraphQLNonNull(MemberTypeIdsEnum) },
   },
 });
 
@@ -52,7 +52,7 @@ export const ChangeProfileInput = new GraphQLInputObjectType({
   fields: {
     isMale: { type: GraphQLBoolean },
     yearOfBirth: { type: GraphQLInt },
-    memberTypeId: { type: EMemberTypeIdsEnum },
+    memberTypeId: { type: MemberTypeIdsEnum },
   },
 });
 
