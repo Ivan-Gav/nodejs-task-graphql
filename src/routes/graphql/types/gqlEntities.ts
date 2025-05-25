@@ -10,6 +10,7 @@ import {
 } from 'graphql';
 import { UUIDType } from './uuid.js';
 import { resolvers } from '../resolvers/resolvers.js';
+import { loaderResolvers } from '../resolvers/loaderResolvers.js';
 
 const {
   resolveProfileByUserId,
@@ -18,6 +19,14 @@ const {
   resolveSubscribedToUserByUserId,
   resolveMemberTypeByProfileId,
 } = resolvers;
+
+const {
+  resolveProfileWithLoader,
+  resolvePostsWithLoader,
+  resolveSubscribedToWithLoader,
+  resolveSubscribedToUserWithLoader,
+  resolveMemberTypeWithLoader,
+} = loaderResolvers;
 
 export const EMemberTypeIdsEnum = new GraphQLEnumType({
   name: 'MemberTypeId',
@@ -57,19 +66,19 @@ export const TUser: GraphQLObjectType = new GraphQLObjectType({
     balance: { type: new GraphQLNonNull(GraphQLFloat) },
     profile: {
       type: TProfile,
-      resolve: resolveProfileByUserId,
+      resolve: resolveProfileWithLoader,
     },
     posts: {
       type: new GraphQLList(TPost),
-      resolve: resolvePostsByUserId,
+      resolve: resolvePostsWithLoader,
     },
     userSubscribedTo: {
       type: new GraphQLList(TUser),
-      resolve: resolveSubscribedToByUserId,
+      resolve: resolveSubscribedToWithLoader,
     },
     subscribedToUser: {
       type: new GraphQLList(TUser),
-      resolve: resolveSubscribedToUserByUserId,
+      resolve: resolveSubscribedToUserWithLoader,
     },
   }),
 });
@@ -82,7 +91,7 @@ export const TProfile = new GraphQLObjectType({
     yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
     memberType: {
       type: TMemberType,
-      resolve: resolveMemberTypeByProfileId,
+      resolve: resolveMemberTypeWithLoader,
     },
   }),
 });
