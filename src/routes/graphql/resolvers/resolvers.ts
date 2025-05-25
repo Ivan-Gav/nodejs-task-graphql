@@ -1,13 +1,6 @@
-import type {
-  MemberType,
-  Post,
-  PrismaClient,
-  Prisma,
-  Profile,
-  User,
-} from '@prisma/client';
-import { EMemberTypeIdsEnum } from '../schema/RootQuery.js';
-import { MemberTypeId } from '../../member-types/schemas.js';
+import type { MemberType, Post, PrismaClient, Profile, User } from '@prisma/client';
+
+import { TPostInput, TProfileInput, TUserInput } from '../types/types.js';
 
 export interface PrismaContext {
   prisma: PrismaClient;
@@ -86,10 +79,7 @@ export const resolvers = {
 
   // mutation resolvers
 
-  createUser: async (
-    dto: { name: string; balance: number },
-    { prisma }: PrismaContext,
-  ) => {
+  createUser: async (dto: TUserInput, { prisma }: PrismaContext) => {
     const { name, balance } = dto;
 
     return prisma.user.create({
@@ -100,10 +90,7 @@ export const resolvers = {
     });
   },
 
-  createPost: async (
-    dto: { title: string; content: string; authorId: string },
-    { prisma }: PrismaContext,
-  ) => {
+  createPost: async (dto: TPostInput, { prisma }: PrismaContext) => {
     const { title, content, authorId } = dto;
 
     return prisma.post.create({
@@ -117,15 +104,7 @@ export const resolvers = {
     });
   },
 
-  createProfile: async (
-    dto: {
-      isMale: boolean;
-      yearOfBirth: number;
-      userId: string;
-      memberTypeId: MemberTypeId;
-    },
-    { prisma }: PrismaContext,
-  ) => {
+  createProfile: async (dto: TProfileInput, { prisma }: PrismaContext) => {
     const { isMale, yearOfBirth, userId, memberTypeId } = dto;
     return prisma.profile.create({
       data: {
