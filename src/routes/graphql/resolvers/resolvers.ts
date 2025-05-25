@@ -1,6 +1,14 @@
 import type { MemberType, Post, PrismaClient, Profile, User } from '@prisma/client';
 
-import { TDto, TPostInput, TProfileInput, TUserInput } from '../types/types.js';
+import {
+  TDto,
+  TPostChange,
+  TPostInput,
+  TProfileChange,
+  TProfileInput,
+  TSubscriptionInput,
+  TUserInput,
+} from '../types/types.js';
 
 export interface PrismaContext {
   prisma: PrismaClient;
@@ -135,7 +143,7 @@ export const resolvers = {
   resolveDeleteUser: async (
     _parent: unknown,
     { id }: { id: string },
-    { prisma }: { prisma: PrismaClient },
+    { prisma }: PrismaContext,
   ) => {
     await prisma.user.delete({
       where: { id },
@@ -146,7 +154,7 @@ export const resolvers = {
   resolveDeletePost: async (
     _parent: unknown,
     { id }: { id: string },
-    { prisma }: { prisma: PrismaClient },
+    { prisma }: PrismaContext,
   ) => {
     await prisma.post.delete({
       where: { id },
@@ -157,11 +165,71 @@ export const resolvers = {
   resolveDeleteProfile: async (
     _parent: unknown,
     { id }: { id: string },
-    { prisma }: { prisma: PrismaClient },
+    { prisma }: PrismaContext,
   ) => {
     await prisma.profile.delete({
       where: { id },
     });
     return id;
+  },
+
+  resolveChangeUser: async (
+    _parent: unknown,
+    { id, dto }: { id: string; dto: TDto<TUserInput> },
+    { prisma }: PrismaContext,
+  ) =>
+    prisma.user.update({
+      where: { id },
+      data: dto,
+    }),
+
+  resolveChangePost: async (
+    _parent: unknown,
+    { id, dto }: { id: string; dto: TPostChange },
+    { prisma }: PrismaContext,
+  ) =>
+    prisma.post.update({
+      where: { id },
+      data: dto,
+    }),
+
+  resolveChangeProfile: async (
+    _parent: unknown,
+    { id, dto }: { id: string; dto: TProfileChange },
+    { prisma }: PrismaContext,
+  ) =>
+    prisma.profile.update({
+      where: { id },
+      data: dto,
+    }),
+
+  resolveSubscribeToUser: async (
+    _parent: unknown,
+    { userId, authorId }: TSubscriptionInput,
+    { prisma }: PrismaContext,
+  ) => {
+    const subscription = await prisma.subscribersOnAuthors.create({
+      data: {
+        subscriberId: userId,
+        authorId,
+      },
+    });
+    return Boolean(subscription);
+  },
+
+  resolveUnubscribeFromUser: async (
+    _parent: unknown,
+    { userId, authorId }: TSubscriptionInput,
+    { prisma }: PrismaContext,
+  ) => {
+    const deleted = await prisma.subscribersOnAuthors.delete({
+      where: {
+        subscriberId_authorId: {
+          subscriberId: userId,
+          authorId,
+        },
+      },
+    });
+    return Boolean(deleted);
   },
 };

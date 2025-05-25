@@ -13,3 +13,16 @@ export type TProfileInput = {
 };
 
 export type TDto<T extends object> = Record<'dto', T>;
+
+export type TPostChange = {
+  title?: string | undefined;
+  content?: string | undefined;
+};
+
+export type TProfileChange = {
+  isMale?: boolean | undefined;
+  yearOfBirth?: number | undefined;
+  memberTypeId?: string | undefined;
+};
+
+export type TSubscriptionInput = { userId: string; authorId: string };
