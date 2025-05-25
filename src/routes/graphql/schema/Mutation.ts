@@ -1,17 +1,24 @@
 import { GraphQLNonNull, GraphQLObjectType } from 'graphql';
-import { PrismaContext, resolvers } from '../resolvers/resolvers.js';
+import { resolvers } from '../resolvers/resolvers.js';
 import { TPost, TProfile, TUser } from '../types/gqlEntities.js';
 import {
   CreatePostInput,
   CreateProfileInput,
   CreateUserInput,
 } from '../types/gqlInputs.js';
-import { TDto, TPostInput, TProfileInput, TUserInput } from '../types/types.js';
+import { UUIDType } from '../types/uuid.js';
 
 export const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: () => {
-    const { createUser, createPost, createProfile } = resolvers;
+    const {
+      resolveCreateProfile,
+      resolveCreatePost,
+      resolveCreateUser,
+      resolveDeletePost,
+      resolveDeleteUser,
+      resolveDeleteProfile,
+    } = resolvers;
 
     return {
       createUser: {
@@ -19,24 +26,47 @@ export const Mutation = new GraphQLObjectType({
         args: {
           dto: { type: new GraphQLNonNull(CreateUserInput) },
         },
-        resolve: (_parent: unknown, args: TDto<TUserInput>, context: PrismaContext) =>
-          createUser(args.dto, context),
+        resolve: resolveCreateUser,
       },
+
       createPost: {
         type: TPost,
         args: {
           dto: { type: new GraphQLNonNull(CreatePostInput) },
         },
-        resolve: (_parent: unknown, args: TDto<TPostInput>, context: PrismaContext) =>
-          createPost(args.dto, context),
+        resolve: resolveCreatePost,
       },
+
       createProfile: {
         type: TProfile,
         args: {
           dto: { type: new GraphQLNonNull(CreateProfileInput) },
         },
-        resolve: (_parent: unknown, args: TDto<TProfileInput>, context: PrismaContext) =>
-          createProfile(args.dto, context),
+        resolve: resolveCreateProfile,
+      },
+
+      deleteUser: {
+        type: UUIDType,
+        args: {
+          id: { type: new GraphQLNonNull(UUIDType) },
+        },
+        resolve: resolveDeleteUser,
+      },
+
+      deletePost: {
+        type: UUIDType,
+        args: {
+          id: { type: new GraphQLNonNull(UUIDType) },
+        },
+        resolve: resolveDeletePost,
+      },
+
+      deleteProfile: {
+        type: UUIDType,
+        args: {
+          id: { type: new GraphQLNonNull(UUIDType) },
+        },
+        resolve: resolveDeleteProfile,
       },
     };
   },

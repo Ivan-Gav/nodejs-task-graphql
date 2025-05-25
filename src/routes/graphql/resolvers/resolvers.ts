@@ -1,6 +1,6 @@
 import type { MemberType, Post, PrismaClient, Profile, User } from '@prisma/client';
 
-import { TPostInput, TProfileInput, TUserInput } from '../types/types.js';
+import { TDto, TPostInput, TProfileInput, TUserInput } from '../types/types.js';
 
 export interface PrismaContext {
   prisma: PrismaClient;
@@ -79,7 +79,11 @@ export const resolvers = {
 
   // mutation resolvers
 
-  createUser: async (dto: TUserInput, { prisma }: PrismaContext) => {
+  resolveCreateUser: async (
+    _parent: unknown,
+    { dto }: TDto<TUserInput>,
+    { prisma }: PrismaContext,
+  ) => {
     const { name, balance } = dto;
 
     return prisma.user.create({
@@ -90,7 +94,11 @@ export const resolvers = {
     });
   },
 
-  createPost: async (dto: TPostInput, { prisma }: PrismaContext) => {
+  resolveCreatePost: async (
+    _parent: unknown,
+    { dto }: TDto<TPostInput>,
+    { prisma }: PrismaContext,
+  ) => {
     const { title, content, authorId } = dto;
 
     return prisma.post.create({
@@ -104,7 +112,11 @@ export const resolvers = {
     });
   },
 
-  createProfile: async (dto: TProfileInput, { prisma }: PrismaContext) => {
+  resolveCreateProfile: async (
+    _parent: unknown,
+    { dto }: TDto<TProfileInput>,
+    { prisma }: PrismaContext,
+  ) => {
     const { isMale, yearOfBirth, userId, memberTypeId } = dto;
     return prisma.profile.create({
       data: {
@@ -118,5 +130,38 @@ export const resolvers = {
         },
       },
     });
+  },
+
+  resolveDeleteUser: async (
+    _parent: unknown,
+    { id }: { id: string },
+    { prisma }: { prisma: PrismaClient },
+  ) => {
+    await prisma.user.delete({
+      where: { id },
+    });
+    return id;
+  },
+
+  resolveDeletePost: async (
+    _parent: unknown,
+    { id }: { id: string },
+    { prisma }: { prisma: PrismaClient },
+  ) => {
+    await prisma.post.delete({
+      where: { id },
+    });
+    return id;
+  },
+
+  resolveDeleteProfile: async (
+    _parent: unknown,
+    { id }: { id: string },
+    { prisma }: { prisma: PrismaClient },
+  ) => {
+    await prisma.profile.delete({
+      where: { id },
+    });
+    return id;
   },
 };
