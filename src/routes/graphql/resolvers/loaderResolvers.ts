@@ -1,3 +1,7 @@
+import { parseResolveInfo } from 'graphql-parse-resolve-info';
+import { GraphQLResolveInfo } from 'graphql';
+import { Prisma, SubscribersOnAuthors } from '@prisma/client';
+
 import { Profile, User, TContext } from '../types/types.js';
 
 export const loaderResolvers = {
@@ -21,4 +25,44 @@ export const loaderResolvers = {
     _args: unknown,
     { loaders }: TContext,
   ) => loaders.subscribedToUser.load(id),
+
+  resolveUsersLikeABoss: async (
+    _parent: unknown,
+    _args: unknown,
+    { prisma, loaders }: TContext,
+    info: GraphQLResolveInfo,
+  ) => {
+    const parsedInfo = parseResolveInfo(info);
+
+    const fields = parsedInfo?.fieldsByTypeName?.User || {};
+    const include: Prisma.UserFindManyArgs['include'] = {};
+
+    if ('userSubscribedTo' in fields) {
+      include.userSubscribedTo = true;
+    }
+
+    if ('subscribedToUser' in fields) {
+      include.subscribedToUser = true;
+    }
+
+    const users = await prisma.user.findMany({ include });
+
+    users.forEach((user) => {
+      if (user.userSubscribedTo) {
+        const authors = (
+          user.userSubscribedTo as Array<SubscribersOnAuthors & { author: User }>
+        ).map((s) => s.author);
+        loaders.userSubscribedTo.prime(user.id, authors);
+      }
+
+      if (user.subscribedToUser) {
+        const subscribers = (
+          user.subscribedToUser as Array<SubscribersOnAuthors & { subscriber: User }>
+        ).map((s) => s.subscriber);
+        loaders.subscribedToUser.prime(user.id, subscribers);
+      }
+    });
+
+    return users;
+  },
 };

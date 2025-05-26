@@ -1,6 +1,7 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLList } from 'graphql';
 import { UUIDType } from '../types/uuid.js';
 import { queryResolvers } from '../resolvers/queryResolvers.js';
+import { loaderResolvers } from '../resolvers/loaderResolvers.js';
 import { MemberType, MemberTypeIdsEnum, Post, User, Profile } from './gqlEntities.js';
 
 const {
@@ -8,11 +9,12 @@ const {
   resolveTypeMemberById,
   resolvePosts,
   resolvePostById,
-  resolveUsers,
   resolveUserById,
   resolveProfiles,
   resolveProfileById,
 } = queryResolvers;
+
+const { resolveUsersLikeABoss } = loaderResolvers;
 
 export const RootQuery = new GraphQLObjectType({
   name: 'RootQuery',
@@ -47,7 +49,7 @@ export const RootQuery = new GraphQLObjectType({
       resolve: resolvePostById,
     },
 
-    users: { type: new GraphQLList(User), resolve: resolveUsers },
+    users: { type: new GraphQLList(User), resolve: resolveUsersLikeABoss },
 
     user: {
       type: User,
