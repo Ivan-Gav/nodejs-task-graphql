@@ -1,5 +1,6 @@
 // import type { MemberType, Post, Profile, User } from '@prisma/client';
-import { TContext, Post, Profile, ProfileMemberType, User } from '../types/types.js';
+import { MemberType, Post, User, Profile } from '@prisma/client';
+import { TContext } from '../types/types.js';
 
 export const queryResolvers = {
   resolveMemberTypes: async (_parent: unknown, _args: unknown, { prisma }: TContext) =>
@@ -7,7 +8,7 @@ export const queryResolvers = {
 
   resolveTypeMemberById: async (
     _parent: unknown,
-    { id }: ProfileMemberType,
+    { id }: MemberType,
     { prisma }: TContext,
   ) => prisma.memberType.findUnique({ where: { id } }),
 

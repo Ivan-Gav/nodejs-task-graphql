@@ -1,18 +1,18 @@
 import {
   TContext,
   TDto,
-  PostChange,
-  PostInput,
-  ProfileChange,
-  ProfileInput,
+  TPostChange,
+  TPostInput,
+  TProfileChange,
+  TProfileInput,
   TSubscriptionInput,
-  UserInput,
+  TUserInput,
 } from '../types/types.js';
 
 export const mutationResolvers = {
   resolveCreateUser: async (
     _parent: unknown,
-    { dto }: TDto<UserInput>,
+    { dto }: TDto<TUserInput>,
     { prisma }: TContext,
   ) => {
     const { name, balance } = dto;
@@ -27,7 +27,7 @@ export const mutationResolvers = {
 
   resolveCreatePost: async (
     _parent: unknown,
-    { dto }: TDto<PostInput>,
+    { dto }: TDto<TPostInput>,
     { prisma }: TContext,
   ) => {
     const { title, content, authorId } = dto;
@@ -45,7 +45,7 @@ export const mutationResolvers = {
 
   resolveCreateProfile: async (
     _parent: unknown,
-    { dto }: TDto<ProfileInput>,
+    { dto }: TDto<TProfileInput>,
     { prisma }: TContext,
   ) => {
     const { isMale, yearOfBirth, userId, memberTypeId } = dto;
@@ -98,7 +98,7 @@ export const mutationResolvers = {
 
   resolveChangeUser: async (
     _parent: unknown,
-    { id, dto }: { id: string; dto: TDto<UserInput> },
+    { id, dto }: { id: string; dto: TDto<TUserInput> },
     { prisma }: TContext,
   ) =>
     prisma.user.update({
@@ -108,7 +108,7 @@ export const mutationResolvers = {
 
   resolveChangePost: async (
     _parent: unknown,
-    { id, dto }: { id: string; dto: PostChange },
+    { id, dto }: { id: string; dto: TPostChange },
     { prisma }: TContext,
   ) =>
     prisma.post.update({
@@ -118,7 +118,7 @@ export const mutationResolvers = {
 
   resolveChangeProfile: async (
     _parent: unknown,
-    { id, dto }: { id: string; dto: ProfileChange },
+    { id, dto }: { id: string; dto: TProfileChange },
     { prisma }: TContext,
   ) =>
     prisma.profile.update({

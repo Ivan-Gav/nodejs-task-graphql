@@ -1,6 +1,6 @@
 import DataLoader from 'dataloader';
-import { PrismaClient } from '@prisma/client';
-import { Post, Profile, ProfileMemberType, User } from '../types/types.js';
+import { MemberType, Post, PrismaClient, Profile, User } from '@prisma/client';
+
 import { groupBy } from './utils.js';
 
 export const createLoaders = (prisma: PrismaClient) => ({
@@ -50,7 +50,7 @@ export const createLoaders = (prisma: PrismaClient) => ({
     return userIds.map((id) => grouped[id]?.map((s) => s.subscriber) ?? []);
   }),
 
-  memberTypeById: new DataLoader<string, ProfileMemberType | null>(
+  memberTypeById: new DataLoader<string, MemberType | null>(
     async (ids: readonly string[]) => {
       const types = await prisma.memberType.findMany({
         where: { id: { in: ids as string[] } },

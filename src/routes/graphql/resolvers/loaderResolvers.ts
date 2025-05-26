@@ -1,8 +1,8 @@
 import { parseResolveInfo } from 'graphql-parse-resolve-info';
 import { GraphQLResolveInfo } from 'graphql';
-import { Prisma, SubscribersOnAuthors } from '@prisma/client';
+import { Prisma, Profile, SubscribersOnAuthors, User } from '@prisma/client';
 
-import { Profile, User, TContext } from '../types/types.js';
+import { TContext } from '../types/types.js';
 
 export const loaderResolvers = {
   resolvePostsWithLoader: async ({ id }: User, _args: unknown, { loaders }: TContext) =>
