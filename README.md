@@ -6,25 +6,26 @@ This task is a part of the [RSSchool Node.js Course](https://rs.school/courses/n
 
 ### Installation
 
-clone this repo
-switch to the dev branch
-run `npm ci` to install dependencies
-create `.env` file in the root directory (copy from .env.example)
+- clone this repo
+- run `npm ci` to install dependencies
+- create `.env` file in the root directory (copy from .env.example)
+- Apply pending migrations: `npx prisma migrate deploy`
+- Seed db: `npx prisma db seed`
 
 ### Scripts
 
 Tests
 
-- `test-integrity`
-- `test-queries`
-- `test-mutations`
-- `test-rule`
-- `test-loader`
-- `test-loader-prime`
+- `npm run test-integrity`
+- `npm run test-queries`
+- `npm run test-mutations`
+- `npm run test-rule`
+- `npm run test-loader`
+- `npm run test-loader-prime`
 
 Other
 
-- `start` - start server
+- `npm run start` - start server
 
 ### Useful things:
 
